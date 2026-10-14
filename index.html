@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Biko App Prototype</title>
+<title>Biko · Booking Demo</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Geist+Mono:wght@500;600&display=swap">
 <style>
 /* =====================================================================
@@ -839,7 +839,7 @@ canvas.confetti{display:none}
 .flagin{width:20px;height:14px;border-radius:3px;background:linear-gradient(#FF9933 0 33%,#fff 33% 66%,#138808 66%);box-shadow:0 0 0 1px var(--hair);position:relative}.flagin::after{content:"";position:absolute;left:50%;top:50%;width:4px;height:4px;translate:-50% -50%;border-radius:50%;border:1px solid #1A3A8F}
 .auor{display:flex;align-items:center;gap:10px}.auor i{flex:1;height:1px;background:var(--line)}
 .ausso{display:grid;grid-template-columns:1fr 1fr;gap:10px}.ausso .btn{gap:8px;min-height:48px;font-size:15px}
-.ssog{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font:800 13px/1 var(--f);color:#fff;background:conic-gradient(#EA4335 0 25%,#FBBC05 0 50%,#34A853 0 75%,#4285F4 0)}.ssog.tc{background:#0087FF}.ssog .ic{color:#fff}
+.ssog:not(.tc){background:none!important}.ssog{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font:800 13px/1 var(--f);color:#fff;background:conic-gradient(#EA4335 0 25%,#FBBC05 0 50%,#34A853 0 75%,#4285F4 0)}.ssog.tc{background:#0087FF}.ssog .ic{color:#fff}
 .otpsug{display:flex;align-items:center;gap:10px;justify-self:center;padding:8px 14px 8px 8px;border-radius:999px;background:var(--surface);box-shadow:0 0 0 1px var(--hair),var(--sh-1);color:var(--text);opacity:0;transform:translateY(8px) scale(.96);pointer-events:none;transition:opacity .35s,transform .45s var(--spring)}
 .otpsug.on{opacity:1;transform:none;pointer-events:auto}.otpsc{letter-spacing:.12em}.otpfill{font-weight:700;margin-left:6px}
 .stg .otpf .otpbox span{position:relative;background:var(--surface);box-shadow:inset 0 0 0 1px var(--line),var(--sh-1)}
@@ -1680,11 +1680,11 @@ const svcCol=()=>SCOL[S.svc]||"#FFB80D";
 const BIKECOL={gigg:["#C6F432","#E9ECE4","#7BE3A9"],lux:["#D9B26F","#3A342C","#EDE3D2"]};
 const col=b=>{const i=BIKES.indexOf(b);return(BIKECOL[S.svc]||[])[i]||b.col};
 
-function go(scr,dirOverride){const prev=S.scr;S.scr=scr;
+function go(scr,dirOverride){if(!["intro","welcome","otp","home","bike","book","paid"].includes(scr))scr="home";const prev=S.scr;S.scr=scr;
   const dir=dirOverride||(prev&&ORDER.indexOf(scr)<ORDER.indexOf(prev)?"b":"f");
   if((scr==="profile"||scr==="notifs")&&prev&&prev!=="profile"&&prev!=="notifs")S.from=prev;
   const flow=FLOW.includes(scr),t=TABIDX[scr]??-1;
-  const tabbed=["home","trips","invest","wallet"].includes(scr);TABS.hidden=!tabbed;PH.classList.toggle("notabs",!tabbed);
+  const tabbed=false;TABS.hidden=!tabbed;PH.classList.toggle("notabs",!tabbed);
   $$(".tabs button").forEach((b,i)=>{const on=i===t;b.classList.toggle("on",on);const u=b.querySelector("use");if(u&&b.dataset.ic)u.setAttribute("href",`#i-${b.dataset.ic}${on?"":"-l"}`)});
   const ind=$("#tabind");ind.style.transform=`translateX(${Math.max(t,0)*100}%)`;ind.style.opacity=t<0?0:1;
   PH.classList.toggle("bleed",["intro","welcome","otp","kyc","service","home","bike","book","paid","ride","ret","trips","invest","wallet","profile","notifs"].includes(scr));
@@ -2002,9 +2002,9 @@ service(){PH.dataset.theme=S.svc;const sg=$("#stg");if(sg)sg.dataset.svc=S.svc;s
     setTimeout(()=>{$("#sbody").innerHTML=scooterInner(SCOL[S.svc])},180)});
   $("#svcnext").onclick=()=>{SFX.success();notify("You're all set",SVC[S.svc].name+" · welcome to Biko, Anu","check");go("home")}},
 intro(){if(S.slide==null)S.slide=0;bindStage();
-  if(S.slide===-1){setTimeout(()=>SFX.light(),1300);setTimeout(()=>{if(S.scr==="intro"&&S.slide===-1)stage(0)},2700)}},
+  if(S.slide===-1){setTimeout(()=>SFX.light(),1300);setTimeout(()=>{if(S.scr==="intro"&&S.slide===-1)toAuth()},2700)}},
 welcome(){bindStage();
-  $$("[data-sso]").forEach(b=>b.onclick=()=>{if(b.dataset.sso==="Truecaller")SFX.allow();else SFX.pick();if(b.dataset.sso==="Truecaller"){const ph=$("#ph");ph.value="9876543210";ph.dispatchEvent(new Event("input",{bubbles:true}));island("Truecaller","Number verified · +91 98765 43210","phone","#0087FF",2200)}else island("Google sign-in","Add your mobile next to finish","message","#4285F4",2400)});
+  $$("[data-sso]").forEach(b=>b.onclick=()=>{if(b.dataset.sso==="Truecaller")SFX.allow();else SFX.pick();if(b.dataset.sso==="Truecaller"){const ph=$("#ph");ph.value="9876543210";ph.dispatchEvent(new Event("input",{bubbles:true}));island("Truecaller","Number verified · +91 98765 43210","phone","#0087FF",2200)}else googleSheet()});
   const ph=$("#ph"),f=$("#phf"),er=$("#pherr");
   const setErr=m=>{S.phoneErr=m;f.classList.toggle("err",!!m);er.hidden=!m;er.querySelector("span").textContent=m||""};
   const sync=()=>f.classList.toggle("valid",PHONE_RE.test(S.phone));
@@ -2016,7 +2016,7 @@ welcome(){bindStage();
 otp(){const run=S.otpRun=(S.otpRun||0)+1;const i=$("#otp"),box=$("#otpbox"),er=$("#otperr"),cells=()=>[...box.querySelectorAll("span")];let locked=false;S.otp="";S.cd=30;
   const draw=()=>cells().forEach((s,k)=>{s.textContent=S.otp[k]||"";s.className=k<S.otp.length?"fill":k===S.otp.length?"cur":""});
   const verify=()=>{locked=true;
-    if(S.otp===OTP_CODE){cells().forEach(s=>s.className="okk");SFX.ok();bikeYes();setTimeout(()=>{if(S.scr!=="otp")return;$("#kycf").innerHTML=kycHTML();stage("kyc");S.scr="kyc";A.kyc()},550)}
+    if(S.otp===OTP_CODE){cells().forEach(s=>s.className="okk");SFX.ok();bikeYes();setTimeout(()=>{if(S.scr!=="otp")return;go("home")},550)}
     else{cells().forEach(s=>s.className="bad");er.hidden=false;er.querySelector("span").textContent="That code doesn't match. Check the SMS and try again.";bikeNo();shakeEl(box);
       setTimeout(()=>{S.otp="";i.value="";locked=false;draw()},700)}};
   const push=v=>{if(locked)return;er.hidden=true;S.otp=v;i.value=v;SFX.key();bike("nudge",260);draw();if(v.length===4)verify()};
@@ -2129,7 +2129,7 @@ paid(){const g=$("#stg");
   swipe($("#startSwipe"),()=>{g.classList.add("unlocked");SFX.clack();setTimeout(()=>SFX.unlock(),140);bike("blink",900);
     setTimeout(()=>{bike("rev",800)},700);
     setTimeout(()=>{g.classList.add("leave","moving");SFX.drive(1)},1300);
-    setTimeout(()=>{notify("Scooter unlocked",`${S.bike.name} · ride safe`,"unlock","y");startRide();go("ride")},2050)})},
+    setTimeout(()=>{notify("Vehicle booked","Demo complete · restarting","check","y");setTimeout(()=>go("home","b"),1800)},2050)})},
 ride(){bindRide()},
 
 ret(){const dep=S.pr?S.pr.dep:2000;
@@ -2398,14 +2398,14 @@ function stageHTML(k){return`
     <div class="ictl"><div class="dots" id="idots">${[0,1,2].map(i=>`<i class="${i===k?"on":""}"></i>`).join("")}</div>
       <div class="row"><button class="btn sm ghost press" id="skip">Skip</button><button class="btn brand press" id="inext">${k===2?"Get started":"Next"}</button></div></div>
     <div class="auth">
-      <div class="autrust">${[["shield","Secure OTP"],["bolt","KYC in 60 s"],["sparkle","4.8 · 20k riders"]].map(([i,t])=>`<span class="t-label">${ic(i,"xs")}${t}</span>`).join("")}</div>
+      <div class="autrust">${[["shield","Secure OTP"],["sparkle","4.8 · 20k riders"]].map(([i,t])=>`<span class="t-label">${ic(i,"xs")}${t}</span>`).join("")}</div>
       <label class="t-label aulbl" for="ph">Mobile number</label>
       <div class="field ${S.phoneErr?"err":""}" id="phf"><span class="pre aucc t-body"><i class="flagin"></i>+91${ic("chevron","xs")}</span>
         <input class="t-body" id="ph" inputmode="numeric" maxlength="10" placeholder="Mobile number" aria-label="Mobile number" value="${S.phone}"><span class="okc">${ic("check")}</span></div>
       <p class="err-msg t-meta" id="pherr" role="alert" ${S.phoneErr?"":"hidden"}>${ic("warning","s")}<span>${S.phoneErr}</span></p>
       <button class="btn brand press" id="next">Get code ${ic("arrow-right","s")}</button>
       <div class="auor"><i></i><span class="t-label mute">or</span><i></i></div>
-      <div class="ausso">${[["G","Google"],["","Truecaller"]].map(([g,t])=>`<button class="btn ghost press" data-sso="${t}"><b class="ssog ${t==="Truecaller"?"tc":""}">${t==="Truecaller"?ic("phone","xs"):g}</b>${t}</button>`).join("")}</div>
+      <div class="ausso">${[["G","Google"],["","Truecaller"]].map(([g,t])=>`<button class="btn ghost press" data-sso="${t}"><b class="ssog ${t==="Truecaller"?"tc":""}">${t==="Truecaller"?ic("phone","xs"):`<svg viewBox="0 0 48 48" width="18" height="18" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.5l6.7-6.7C35.6 2.4 30.2 0 24 0 14.6 0 6.6 5.4 2.6 13.2l7.8 6.1C12.3 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.6 5.9c4.4-4.1 7-10.1 7-17.6z"/><path fill="#FBBC05" d="M10.4 28.7c-.5-1.4-.8-3-.8-4.7s.3-3.3.8-4.7l-7.8-6.1C.9 16.5 0 20.1 0 24s.9 7.5 2.6 10.8l7.8-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.9 2.3-8.3 2.3-6.3 0-11.7-4.1-13.6-9.8l-7.8 6.1C6.6 42.6 14.6 48 24 48z"/></svg>`}</b>${t}</button>`).join("")}</div>
       <p class="t-meta mute terms">By continuing you agree to Biko's <b>Terms</b> and <b>Privacy Policy</b>.</p></div>
     <div class="svcf" id="svcf">${k==="service"?svcHTML():""}</div>
     <div class="kycf" id="kycf">${k==="kyc"?kycHTML():""}</div>
@@ -2457,6 +2457,9 @@ function stage(k){const g=$("#stg");if(!g)return;const prev=S.slide;S.slide=k;
   else if(k===1)stage.p=setTimeout(()=>{if(S.slide===1)SFX.charge()},1000);
   else if(k===2)stage.p=setTimeout(()=>{if(S.slide===2){SFX.scanning();setTimeout(()=>{if(S.slide===2)SFX.doc()},1300)}},700);
   const c=$("#copy");c.classList.add("fade");setTimeout(()=>{c.innerHTML=copyHTML(k);c.classList.remove("fade")},220)}
+function googleSheet(){const s=sheet(`<div id="gs" style="padding:4px 4px 20px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:6px"><svg viewBox="0 0 48 48" width="18" height="18" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.5l6.7-6.7C35.6 2.4 30.2 0 24 0 14.6 0 6.6 5.4 2.6 13.2l7.8 6.1C12.3 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.6 5.9c4.4-4.1 7-10.1 7-17.6z"/><path fill="#FBBC05" d="M10.4 28.7c-.5-1.4-.8-3-.8-4.7s.3-3.3.8-4.7l-7.8-6.1C.9 16.5 0 20.1 0 24s.9 7.5 2.6 10.8l7.8-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.9 2.3-8.3 2.3-6.3 0-11.7-4.1-13.6-9.8l-7.8 6.1C6.6 42.6 14.6 48 24 48z"/></svg><span class="t-meta mute">Sign in with Google</span></div><h2 class="t-h" style="margin:10px 0 2px">Choose an account</h2><p class="t-meta mute" style="margin:0 0 12px">to continue to <b>Biko</b></p><button class="press gacct" data-acct="Anu Thomas" style="display:flex;align-items:center;gap:12px;width:100%;padding:12px 4px;background:none;border:0;border-top:1px solid var(--hair,#0001);text-align:left;color:inherit;font:inherit;cursor:pointer"><span style="width:36px;height:36px;border-radius:50%;background:#8E5BD9;color:#fff;display:grid;place-items:center;font-weight:700">A</span><span style="display:flex;flex-direction:column"><b class="t-body">Anu Thomas</b><span class="t-meta mute">anu.thomas@gmail.com</span></span></button><button class="press gacct" data-acct="Anu (Work)" style="display:flex;align-items:center;gap:12px;width:100%;padding:12px 4px;background:none;border:0;border-top:1px solid var(--hair,#0001);text-align:left;color:inherit;font:inherit;cursor:pointer"><span style="width:36px;height:36px;border-radius:50%;background:#1FA971;color:#fff;display:grid;place-items:center;font-weight:700">A</span><span style="display:flex;flex-direction:column"><b class="t-body">Anu (Work)</b><span class="t-meta mute">anu@fegno.com</span></span></button><p class="t-label mute" style="margin-top:14px">Google will share your name, email and profile picture with Biko.</p></div>`);
+  s.querySelectorAll("[data-acct]").forEach(b=>b.onclick=()=>{SFX.pick();hap("light");s.querySelector("#gs").innerHTML=`<div class="center stack-4" style="padding:28px 0 36px"><span class="dots3"><i></i><i></i><i></i></span><b class="t-h">Signing in…</b><span class="t-meta mute">${b.dataset.acct}</span></div>`;
+    setTimeout(()=>{closeSheet(s);SFX.ok();S.phone=S.phone||"9876543210";island("Signed in with Google",b.dataset.acct,"check","#4285F4",2200);setTimeout(()=>go("home"),300)},1300)})}
 function toAuth(){if(S.slide==="auth")return;SFX.next();stage("auth");S.scr="welcome";A.welcome()}
 function bindStage(){const g=$("#stg");if(!g)return;
   $("#inext").onclick=()=>{SFX.next();S.slide===2?toAuth():stage(S.slide+1)};
@@ -2866,6 +2869,7 @@ $("#mute").onclick=()=>{muted=!muted;if(muted)motorStop();$("#mute span").textCo
 function fit(){const W=418,H=890,sc=Math.min(1,(innerWidth-32)/W,(innerHeight-96)/H);
   $("#device").style.transform=`scale(${sc})`;$("#fit").style.width=W*sc+"px";$("#fit").style.height=H*sc+"px"}
 addEventListener("resize",fit);fit();
+PH.addEventListener("scroll",()=>{if(PH.scrollTop||PH.scrollLeft){PH.scrollTop=0;PH.scrollLeft=0}});
 const clk=()=>{$("#clock").textContent=new Date().toLocaleTimeString("en-IN",{hour:"numeric",minute:"2-digit",hour12:false})};clk();setInterval(clk,10000);
 init();
 
