@@ -553,7 +553,7 @@ canvas.confetti{display:none}
 .stg .sback{position:absolute;left:16px;top:56px;opacity:0;pointer-events:none;transition:opacity .3s}.stg.st-otp .sback{opacity:1;pointer-events:auto;transition-delay:.3s}
 .stg .otpf{position:absolute;left:20px;right:20px;bottom:30px;display:grid;gap:14px;opacity:0;transform:translateY(60px);pointer-events:none;transition:opacity .45s,transform .7s var(--ease)}
 .stg.st-otp .otpf{opacity:1;transform:none;pointer-events:auto;transition-delay:.3s}
-.stg .otpf .otpbox span{height:62px}
+
 .stg.st-kyc .road,.stg.st-kyc .ictl{opacity:0;pointer-events:none}.stg.st-kyc .ictl{transform:translateY(40px)}
 .stg.st-kyc .scoot{transform:translateY(-212px) scale(.52)}
 .stg.st-kyc .copy{top:218px}
@@ -1361,6 +1361,7 @@ body,#phone{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale
 .tcfoot{padding-top:12px}.tcfoot .tcpay{display:grid;justify-items:start;gap:0}
 .tcrc{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:999px;background:var(--surface-2);color:var(--text);font-weight:700;transition:background .2s}
 .tcard:active .tcrc{background:color-mix(in srgb,var(--acc) 22%,var(--surface))}
+.stg .otpf .otpbox{grid-template-columns:repeat(4,64px)!important;justify-content:center!important;gap:14px!important}.stg .otpf .otpbox span{width:64px!important;height:64px!important;border-radius:14px!important}
 </style>
 </head>
 <body>
