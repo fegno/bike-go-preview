@@ -1615,9 +1615,9 @@ const SVC={
     strip:{bg:"#E9E0FA",ic:"key",eb:"Your garage",t:"Ather Rizta · day 12 of 30",s:"Free service due in 6 days"},bg:["#8B6FD6","#C9B4F5","#FFB80D"]}
 };
 const BIKES=[
-  {id:"BK-214",name:"Ather Rizta",reg:"KL-07-EV-2214",batt:86,col:"#FFB80D",station:"MG Road",dist:"400 m",top:80},
-  {id:"BK-118",name:"Ola S1 X",reg:"KL-07-EV-1180",batt:64,col:"#3B82C4",station:"Edappally",dist:"1.1 km",top:90},
-  {id:"BK-305",name:"TVS iQube",reg:"KL-07-EV-3051",batt:92,col:"#1FB46E",station:"Vyttila",dist:"2.3 km",top:78}
+  {id:"BK-214",name:"Ather Rizta",reg:"KL-07-EV-2214",batt:86,col:"#FFB80D",station:"MG Road",dist:"400 m",top:80,rate:{Hours:79,Days:449},dep:2000},
+  {id:"BK-118",name:"Ola S1 X",reg:"KL-07-EV-1180",batt:64,col:"#3B82C4",station:"Edappally",dist:"1.1 km",top:90,rate:{Hours:69,Days:399},dep:1500},
+  {id:"BK-305",name:"TVS iQube",reg:"KL-07-EV-3051",batt:92,col:"#1FB46E",station:"Vyttila",dist:"2.3 km",top:78,rate:{Hours:75,Days:429},dep:2000}
 ];
 const POI=[
   {k:"st",x:36,y:30,d:3,l:"MG Road"},{k:"st",x:74,y:68,d:6,l:"Vyttila"},{k:"st",x:24,y:76,d:9,l:"Fort Kochi"},
@@ -1964,7 +1964,7 @@ function bikesHTML(){
       <span class="info"><span class="row" style="gap:6px"><b class="t-body">${b.name}</b>${i===0?`<span class="badge t-label ok">Closest</span>`:""}</span>
         <span class="t-meta mute">${b.station} · ${walk} min walk</span>
         <span class="ncbat"><span class="bar ${lo?"lo":""}"><i style="width:${b.batt}%"></i></span><small class="t-label mute">${b.batt}% · ~${r} km range</small></span>
-        <span class="ncfoot"><span><b class="t-num">${inr(v.rate[u])}</b><small class="t-label mute"> /${v.unit}</small></span><span class="bcgo t-label">Book${ic("arrow-right","xs")}</span></span></span></button>`}).join("")}
+        <span class="ncfoot"><span><b class="t-num">${inr(rateOf(u,typeof b!=="undefined"&&b&&b.rate?b:S.bike))}</b><small class="t-label mute"> /${v.unit}</small></span><span class="bcgo t-label">Book${ic("arrow-right","xs")}</span></span></span></button>`}).join("")}
 function activeCard(){return`<button class="surface tap press row" id="toRide" style="box-shadow:inset 0 0 0 2px var(--y-500),var(--e1)"><span class="stack-2"><span>${bd("Active now","warn")}</span><b class="t-h">${S.bike.name}</b><span class="t-meta mute">${S.bike.reg}</span></span>${ic("arrow-right")}</button>`}
 const tripCard=(t,i)=>`
     <button class="tcard press" data-trip="${i}" style="--i:${i};--tc:${t.c}">
@@ -2093,7 +2093,7 @@ book(){const v=SVC[S.svc];if(!v.units.includes(S.unit))S.unit=v.units.at(-1);bin
   const cpChip=()=>{const c=$("#cpChip");c.classList.toggle("ok",S.couponOk);$("#cpTxt").textContent=S.couponOk?S.coupon+" applied":"Add coupon"};
   const billSheet=(focusCoupon)=>sheet(`${miniStage(col(S.bike),inr(price().total),"c-pick c-hello c-bill")}<div class="row"><h3 class="t-title">Your bill</h3><span class="t-meta mute">${S.bike.name} · ${S.qty} ${(S.qty===1?S.unit.slice(0,-1):S.unit).toLowerCase()}</span></div><div class="bill bl2" id="bill"></div>
       <div class="nfh"><span class="t-label">Offers</span><span class="t-label mute">${COUPONS.length} available</span></div>
-      <div class="cplist">${[["WELCOME15","15% off your first ride","Up to ₹500 · new riders"],["BIKO10","10% off any ride","No minimum · this week"]].map(([c,t,sub])=>`<button class="cpc press" data-cp="${c}"><span class="cpl"><span class="t-mono">${c}</span></span><span class="main"><b class="t-meta">${t}</b><small class="t-label mute">${sub}</small></span><span class="cpst t-label"></span></button>`).join("")}</div>
+      <div class="cplist">${[["WELCOME15","15% off your first ride","Up to ₹500 · new riders"],["BIKO10","10% off any ride","Up to ₹300 · this week"]].map(([c,t,sub])=>`<button class="cpc press" data-cp="${c}"><span class="cpl"><span class="t-mono">${c}</span></span><span class="main"><b class="t-meta">${t}</b><small class="t-label mute">${sub}</small></span><span class="cpst t-label"></span></button>`).join("")}</div>
       <div class="stack-2"><div class="field" id="cpw">${ic("tag","s")}<input class="t-body" id="cp" placeholder="Coupon code" aria-label="Coupon code" autocapitalize="characters" value="${S.coupon}"><button class="btn sm press" id="apply">Apply</button></div>
       <p class="err-msg t-meta" id="cperr" role="alert" hidden>${ic("warning","s")}<span></span></p></div>
       <button class="btn press" data-close>Done</button>`,sh=>{
@@ -2285,7 +2285,7 @@ function bikeStageHTML(){const b=S.bike,v=SVC[S.svc],u=v.units.at(-1),pt=(x,y)=>
     <div class="copy bdcopy"><h1 class="t-title">${b.name}</h1><span class="t-num t-mono mute">${b.reg}</span></div>
     <div class="bdk">${[["battery",b.batt+"%","Battery",b.batt>30?"ok":"warn",b.batt],["route",Math.round(b.batt*KMPCT)+" km","Range","info"],["bolt",b.top+" km/h","Top speed","y"]].map(([i,v2,l,t,bar])=>`<div class="kpi"><span class="row start" style="gap:6px"><span class="tile xs ${t}">${ic(i,"xs")}</span><small class="t-label mute">${l}</small></span><b class="t-num">${v2}</b>${bar!=null?`<span class="ivu"><span class="bar"><i style="width:${bar}%;background:var(--ok)"></i></span></span>`:""}</div>`).join("")}</div>
     <div class="bpick"><span class="bpmap">${ic("pin","s")}</span><span class="stack-1" style="gap:2px;min-width:0"><b class="t-body">Biko ${b.station}</b><span class="t-meta mute">${b.dist} · 5 min walk · Open 24h</span></span><span class="bpdir">${ic("navigation","s")}</span></div>
-    <div class="bcta"><span class="stack-1" style="gap:0"><b class="t-num-l">${inr(v.rate[u])}<small class="t-meta mute"> /${v.unit}</small></b><small class="t-label mute">Helmet + insurance incl.</small></span><button class="btn brand press" id="next">Choose time ${ic("arrow-right","s")}</button></div>
+    <div class="bcta"><span class="stack-1" style="gap:0"><b class="t-num-l">${inr(rateOf(u,typeof b!=="undefined"&&b&&b.rate?b:S.bike))}<small class="t-meta mute"> /${v.unit}</small></b><small class="t-label mute">Helmet + insurance incl.</small></span><button class="btn brand press" id="next">Choose time ${ic("arrow-right","s")}</button></div>
   </div>`}
 /* ---------- home: scooter stage (same scene language as onboarding) ---------- */
 const segHTML=()=>{const k=Object.keys(SVC).indexOf(S.svc);return`<div class="seg" id="seg" style="--n:3;--k:${k}"><span class="si"></span>${Object.entries(SVC).map(([key,s])=>`<button data-m="${key}" class="${S.svc===key?"on":""}">${ic(s.ic)}${s.short}</button>`).join("")}</div>`};
@@ -2293,7 +2293,7 @@ function hpropsHTML(b){if(!S.bikesReady)return`<div class="skel" style="width:21
   return`<div class="bbig"><i style="width:${b.batt}%;background:${b.batt>30?"var(--ok)":"var(--warn)"}"></i></div><div class="row start" style="gap:6px">${bd(b.batt+"%","ok","battery")}${bd("~"+Math.round(b.batt*KMPCT)+" km range","","bolt")}${bd(b.top+" km/h","")}</div>`}
 function hcopyHTML(b){const v=SVC[S.svc],u=v.units.at(-1);
   if(!S.bikesReady)return`<h1 class="t-title">Finding scooters…</h1><p class="t-body">Looking around ${S.loc==="approx"?"Kochi":"you"}</p>`;
-  return`<h1 class="t-title">${b.name}</h1><p class="t-body">${ic("pin","xs")} Biko ${b.station} · ${b.dist} away</p><p class="t-h">${inr(v.rate[u])}<span class="t-meta mute"> / ${u.slice(0,-1).toLowerCase()}</span></p>`}
+  return`<h1 class="t-title">${b.name}</h1><p class="t-body">${ic("pin","xs")} Biko ${b.station} · ${b.dist} away</p><p class="t-h">${inr(rateOf(u,typeof b!=="undefined"&&b&&b.rate?b:S.bike))}<span class="t-meta mute"> / ${u.slice(0,-1).toLowerCase()}</span></p>`}
 function homeStageHTML(){const v=SVC[S.svc],i=S.bi||0,b=BIKES[i];return`
   <div class="stg hm" id="stg">
     <div class="ftop"><button class="pill press" data-go="profile" aria-label="Profile"><span class="avatar uph">${meImg()}</span><span class="stack-1" style="gap:0;text-align:left"><span class="t-label mute">${greet()}</span><b class="t-h">Hi, Anu</b></span></button>
@@ -2332,7 +2332,7 @@ function hmoreHTML(){const v=SVC[S.svc],u=v.units.at(-1),L=LOOPS[S.svc],rk=Math.
       <span class="ncart">${scooterSVG(col(b),112)}<span class="ncdist t-label">${ic("pin","xs")}${b.dist}</span></span>
       <span class="ncbody"><b class="t-body">${b.name}</b><span class="t-meta mute">${b.station} station</span>
       <span class="ncbat"><span class="bar ${lo?"lo":""}"><i style="width:${b.batt}%"></i></span><small class="t-label mute">${b.batt}% · ~${r} km</small></span>
-      <span class="ncfoot"><span><b class="t-num">${inr(v.rate[u])}</b><small class="t-label mute"> /${v.unit}</small></span><span class="ncgo">${ic("arrow-right","xs")}</span></span></span></button>`}).join("")
+      <span class="ncfoot"><span><b class="t-num">${inr(rateOf(u,typeof b!=="undefined"&&b&&b.rate?b:S.bike))}</b><small class="t-label mute"> /${v.unit}</small></span><span class="ncgo">${ic("arrow-right","xs")}</span></span></span></button>`}).join("")
     :[0,1].map(()=>`<div class="ncard"><span class="skel" style="height:96px;border-radius:16px"></span><span class="skel" style="height:14px;width:70%"></span><span class="skel" style="height:12px;width:50%"></span></div>`).join("");
   return`<section class="hsec"><div class="nfh"><span class="t-label">More near you</span><span class="t-label ${S.bikesReady?"ok-t":"mute"}">${S.bikesReady?BIKES.length+" available":"Finding…"}</span></div><div class="nscroll">${near}</div></section>
     <section class="hsec"><div class="nfh"><span class="t-label">${L.t}</span>${S.svc==="tour"?`<span class="t-label mute">Range ~${rk} km</span>`:""}</div>
@@ -2544,7 +2544,7 @@ function paySheet(done){
         s.querySelector("#ok").textContent=pyLbl(sel);miniState(s,"c-pick c-blink",icOf(sel))});
       s.querySelector("#ok").onclick=()=>{S.pay=sel;closeSheet(s);done&&done()}})}
 function receiptSheet(t){
-  const rows=[["Rent · "+t.dur,t.rent],["GST 5%",t.gst]];if(t.disc)rows.push(["Coupon",-t.disc]);if(t.wallet)rows.push(["Biko wallet",-t.wallet]);
+  const rows=[["Rent · "+t.dur,t.rent],["GST 18%",t.gst]];if(t.disc)rows.push(["Coupon",-t.disc]);if(t.wallet)rows.push(["Biko wallet",-t.wallet]);
   const paid=t.rent+t.gst-(t.disc||0)-(t.wallet||0);
   sheet(`${miniStage(t.c,'<span class="kmb"><span id="rkmc">0</span>&nbsp;km</span>',"c-wait c-replay")}
     <div class="rcp"><div class="rchead"><span class="stack-1" style="gap:0"><small class="t-label mute">Total paid</small><b class="t-num-l">${inr(paid)}</b><span class="t-meta mute">${t.n} · <span class="t-mono">${t.reg}</span></span></span>${bd("Completed","ok","check")}</div>
@@ -2694,9 +2694,15 @@ function mapHTML(km,ride){const R0=haloR(km),approx=S.loc==="approx";return`
     ${approx?`<button class="pill pad press locchip t-label" id="locbtn">${ic("pin","xs")}Approximate · Enable</button>`:""}</div>`}
 function bindMarkers(){$$("[data-poi]").forEach(b=>b.onclick=()=>{const p=POI[b.dataset.poi],inR=p.d<=rangeKm();SFX.pick();if(!inR)hap("warning");
   island(`${p.k==="sw"?"Indofast":"Biko"} ${p.l}`,`${p.d} km · ${inR?"inside your range":"outside your range"}`,p.k==="sw"?"bolt":"scooter",inR?(p.k==="sw"?"var(--ok)":"var(--y-600)"):"#555")})}
-function price(){const v=SVC[S.svc],rent=v.rate[S.unit]*S.qty,dep=S.svc==="lux"?5000:2000,gst=rent*.05;
-  const disc=S.couponOk?(S.coupon==="WELCOME15"?Math.min(rent*.15,500):Math.min(rent*.1,300)):0;
-  const wallet=Math.min(S.wallet,Math.max(0,rent+gst-disc));return{rent,dep,gst,disc,wallet,total:rent+gst+dep-disc-wallet}}
+function rateOf(u,b=S.bike){const v=SVC[S.svc];return (b&&b.rate&&b.rate[u]!=null)?b.rate[u]:v.rate[u]}
+function price(){const b=S.bike,u=S.unit,q=S.qty,hr=rateOf("Hours"),day=rateOf("Days");
+  let base=u==="Hours"?q*hr:q*day,capped=false;if(u==="Hours"&&day!=null&&base>day){base=day;capped=true}
+  const longOff=u==="Days"&&q>=7?Math.round(base*.10):0,rent=base-longOff;
+  const disc=S.couponOk?Math.round(S.coupon==="WELCOME15"?Math.min(rent*.15,500):Math.min(rent*.10,300)):0;
+  const taxable=rent-disc,cgst=Math.round(taxable*.09),sgst=Math.round(taxable*.09),gst=cgst+sgst;
+  const dep=(b&&b.dep)||(S.svc==="lux"?5000:2000);
+  const wallet=S.pay==="station"?0:Math.min(S.wallet,taxable+gst);
+  return{base,longOff,rent,disc,taxable,cgst,sgst,gst,dep,wallet,capped,total:taxable+gst+dep-wallet}}
 function drawTicks(){const v=SVC[S.svc],m=v.max[S.unit];let g="";for(let i=0;i<m;i++){const a=i/m*2*Math.PI-Math.PI/2;
   g+=`<line x1="${125+117*Math.cos(a)}" y1="${125+117*Math.sin(a)}" x2="${125+123*Math.cos(a)}" y2="${125+123*Math.sin(a)}" class="d-tick" stroke-width="2" stroke-linecap="round"/>`}$("#ticks").innerHTML=g}
 let lastTotal=null;
@@ -2707,14 +2713,15 @@ function upd(bump){const v=SVC[S.svc],m=v.max[S.unit],f=S.qty/m;$("#arc").setAtt
   const end=new Date();if(S.unit==="Hours")end.setHours(end.getHours()+S.qty);else if(S.unit==="Days")end.setDate(end.getDate()+S.qty);else end.setMonth(end.getMonth()+S.qty);
   $("#dr").textContent="until "+end.toLocaleString("en-IN",S.unit==="Hours"?{hour:"numeric",minute:"2-digit"}:{weekday:"short",day:"numeric",month:"short"});
   $("#dial").setAttribute("aria-valuenow",S.qty);
-  const p=price(),bl=$("#bill");if(bl)bl.innerHTML=`<div class="row"><span class="t-meta">Rent <small class="t-label mute">${S.qty} × ${inr(v.rate[S.unit])}</small></span><span class="t-num">${inr(p.rent)}</span></div>
-    <div class="row"><span class="t-meta">GST 5%</span><span class="t-num">${inr(p.gst)}</span></div>
+  const p=price(),bl=$("#bill");if(bl)bl.innerHTML=`<div class="row"><span class="t-meta">Rent <small class="t-label mute">${S.qty} × ${inr(rateOf(S.unit))}${p.capped?" · capped at day rate":""}</small></span><span class="t-num">${inr(p.base)}</span></div>
+    ${p.longOff?`<div class="row"><span class="t-meta ok-t">${ic("tag","xs")} Weekly saver 10%</span><span class="t-num ok-t">−${inr(p.longOff)}</span></div>`:""}
     ${p.disc?`<div class="row"><span class="t-meta ok-t">${ic("tag","xs")} ${S.coupon}</span><span class="t-num ok-t">−${inr(p.disc)}</span></div>`:""}
+    <div class="row"><span class="t-meta">CGST 9%</span><span class="t-num">${inr(p.cgst)}</span></div><div class="row"><span class="t-meta">SGST 9%</span><span class="t-num">${inr(p.sgst)}</span></div>
     ${p.wallet?`<div class="row"><span class="t-meta ok-t">${ic("wallet","xs")} Biko wallet</span><span class="t-num ok-t">−${inr(p.wallet)}</span></div>`:""}
     <div class="row"><span class="t-meta">Security deposit <span class="badge t-label ok">Refundable</span></span><span class="t-num">${inr(p.dep)}</span></div>
-    <div class="row tot"><span class="stack-1" style="gap:0"><b class="t-body">${S.pay==="station"?"To pay at station":"To pay now"}</b>${p.disc?`<small class="t-label ok-t">You save ${inr(p.disc)}</small>`:""}</span><b class="t-num-l">${inr(p.total)}</b></div>`;
+    <div class="row tot"><span class="stack-1" style="gap:0"><b class="t-body">${S.pay==="station"?"To pay at station":"To pay now"}</b>${p.disc+p.longOff?`<small class="t-label ok-t">You save ${inr(p.disc+p.longOff)}</small>`:`<small class="t-label mute">Incl. ${inr(p.dep)} refundable deposit</small>`}</span><b class="t-num-l">${inr(p.total)}</b></div>`;
   const tl=$("#totLbl");if(tl)tl.textContent=S.pay==="station"?"To pay at station":"To pay";
-  const sb=$("#bsub");if(sb)sb.innerHTML=`<span><small class="t-label mute">Rent</small><b class="t-num">${inr(p.rent)}</b></span><span><small class="t-label mute">GST 5%</small><b class="t-num">${inr(p.gst)}</b></span><span><small class="t-label ok-t">Deposit · back</small><b class="t-num">${inr(p.dep)}</b></span>${p.disc?`<span><small class="t-label mute">Coupon</small><b class="t-num ok-t">−${inr(p.disc)}</b></span>`:""}`;
+  const sb=$("#bsub");if(sb)sb.innerHTML=`<span><small class="t-label mute">Rent</small><b class="t-num">${inr(p.taxable)}</b></span><span><small class="t-label mute">GST 18%</small><b class="t-num">${inr(p.gst)}</b></span><span><small class="t-label ok-t">Deposit</small><b class="t-num">${inr(p.dep)}</b></span>${p.wallet?`<span><small class="t-label mute">Wallet</small><b class="t-num ok-t">−${inr(p.wallet)}</b></span>`:""}`;
   const tt=$("#tot");if(tt&&(lastTotal===null||lastTotal===p.total))tt.textContent=inr(p.total);
   $$(".bk .wheel").forEach(w=>w.style.transform=`rotate(${S.qty*48}deg)`);const rd=$("#broad");if(rd)rd.style.backgroundPosition=`${-S.qty*14}px 0`;
   if(lastTotal!==null&&lastTotal!==p.total)countUp($("#tot"),p.total,lastTotal,350);lastTotal=p.total;
